@@ -26,6 +26,11 @@ endif
 colorscheme desert
 set guioptions=gmrLTe
 
+" Mouse
+if has('mouse')
+  set mouse=a
+endif
+
 " Hello, I'm Mac
 if has("gui_mac")
 	set encoding=utf-8 fileencodings=utf-8,cp1251 fileformat=dos
@@ -44,8 +49,8 @@ elseif has("gui_win32")
 	source $VIMRUNTIME/mswin.vim
 
 	" Меню выбора кодировки текста
-    set wildmenu
-    set wcm=<Tab>
+	set wildmenu
+	set wcm=<Tab>
 	menu Кодировка.UTF-8		:e ++enc=utf8<CR>
 	menu Кодировка.Windows-1251	:e ++enc=cp1251<CR>
 	menu Кодировка.KOI8-R		:e ++enc=koi8-r<CR>
