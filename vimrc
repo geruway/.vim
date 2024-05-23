@@ -42,9 +42,9 @@ if has("gui_mac")
 elseif has("gui_win32")
 	" Чтобы работали операторы смены регистра
 	language ctype Russian_Russia.1251
-	set encoding=cp1251 fileencodings=utf-8,cp1251,koi8-r,cp866 fileformat=dos
+	set encoding=utf-8 fileencodings=utf-8,cp1251,koi8-r,cp866 fileformat=dos
 	set iskeyword=@,a-z,A-Z,48-57,_,128-175,192-255
-	set guifont=DejaVu_Sans_Mono:h11:cRUSSIAN " PT_Mono:h12:cRUSSIAN
+	set guifont=Consolas:h11:cRUSSIAN " PT_Mono:h12:cRUSSIAN
 
 	source $VIMRUNTIME/mswin.vim
 
@@ -54,7 +54,7 @@ elseif has("gui_win32")
 	menu Кодировка.UTF-8		:e ++enc=utf8<CR>
 	menu Кодировка.Windows-1251	:e ++enc=cp1251<CR>
 	menu Кодировка.KOI8-R		:e ++enc=koi8-r<CR>
-	menu Кодировка.CP866		:e ++enc=cp866<CR> 
+	menu Кодировка.CP866		:e ++enc=cp866<CR>  
 	map <F8> :emenu Кодировка.<Tab>
 
 	" netrw
@@ -64,9 +64,12 @@ elseif has("gui_win32")
 endif
 
 " Избавляемся от необходимости лишний раз переключать раскладку
-set langmap=ёйцукенгшщзхъфывапролджэячсмитьбюЁЙЦУКЕHГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;`qwertyuiop[]asdfghjkl\\;'zxcvbnm\\,.~QWERTYUIOP{}ASDFGHJKL:\\"ZXCVBNM<>
+"set langmap=ёйцукенгшщзхъфывапролджэячсмитьбюЁЙЦУКЕHГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;`qwertyuiop[]asdfghjkl\\;'zxcvbnm\\,.~QWERTYUIOP{}ASDFGHJKL:\\"ZXCVBNM<>
+set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 " Клавиши
+map <F5> :nohl<CR>:echo "Подсветка поиска выключена"<CR>
+
 function Wrap()
 	if &wrap == 0
 		set wrap
@@ -76,10 +79,33 @@ function Wrap()
 		echo "Обрыв строк выключен"
 	endif
 endfunction
-map <F5> :nohl<CR>:echo "Подсветка поиска выключена"<CR>
 map <F6> :call Wrap()<CR>
+
 map <F7> <Esc>:let @* = expand('%:t') .':'. line('.')<CR>:echo 'Имя файла и номер строки скопированы в системный буфер!'<CR>
-" A4Tech X7 X-760H additional keys
+
+function Typography()
+	if &syntax == ''
+		set syntax=html
+	endif
+	" Тире
+	'<,'>s/\s\+[-–—]\s\+/\&nbsp;\&mdash; /ge |
+	" Предлоги
+	'<,'>s/\<\(безо\?\|близ\|во\?\|для\|до\|за\|изо\?\|ко\?\|на\(до\?\)\?\|о\([бт]о\?\)\?\|пе\?редо\?\|по\(до\?\)\?\|пр[ио]\|со\?\|у\|че\?рез\)\>\s\+/\1\&nbsp;/ge
+	" Союзы
+	'<,'>s/\<\(а\|и\|но\|да\)\>\s\+/\1\&nbsp;/ge
+	" Частицы
+	'<,'>s/\<\(не\)\>\s\+/\1\&nbsp;/ge
+	'<,'>s/\s\+\<\(ли\|же\)\>/\&nbsp;\1/ge
+	" Год-года
+	'<,'>s/\<\(\d\{2,4\}\)\>\s\+\<\(года\?\)\>/\1\&nbsp;\2/ge
+	" Месяцы
+	'<,'>s/\<\(\d\{1,2\}\)\>\s\+\<\(январ[ья]\|феврал[ья]\|марта\?\|апрел[ья]\|ма[йя]\|июн[ья]\|июл[ья]\|августа\?\|сентябр[ья]\|октябр[ья]\|ноябр[ья]\|декабр[ья]\)\>/\1\&nbsp;\2/ge
+
+	echo "Оттипографировано!"
+endfunction
+map <F8> <Esc>:call Typography()<CR>
+
+" A4Tech mouse additional keys
 map <X1Mouse> <C-O>
 map <X2Mouse> <C-I>
 
@@ -99,23 +125,44 @@ if version >= 700
 	map <F11> <Esc>:call ChangeSpellLang()<CR>
 endif
 
+" <Shift-Backspace> windows-style
+imap <C-BS> <C-W>
+
+" <Shift-Tab> for command mode
+"nnoremap <S-Tab> <<
+" <Shift-Tab> for insert mode
+"inoremap <S-Tab> <C-d>
+
+" both visual and select modes at once. gv means reselect the last selection
+vnoremap <Tab> >gv
+vnoremap <S-Tab> <gv
+
+" just visual mode. this is unsurprisingly the same as vnoremap
+xnoremap <Tab> >gv
+xnoremap <S-Tab> <gv
+
+" just select mode. <C-o> leaves select mode for visual mode, where the
+" command is performed, and <C-g> reenters select mode from visual mode
+snoremap <Tab> <C-o>>gv<C-g>
+snoremap <S-Tab> <C-o><gv<C-g>
+
 " zen coding
 let g:user_zen_settings = {'charset': 'windows-1251'}
 
 " Drupal
-au BufNewFile,BufRead *.info set filetype=ini
-au BufNewFile,BufRead *.profile set filetype=php
-au BufNewFile,BufRead *.install set filetype=php
-au BufNewFile,BufRead *.module set filetype=php
+au BufNewFile,BufRead *.info	set filetype=ini
+au BufNewFile,BufRead *.profile	set filetype=php
+au BufNewFile,BufRead *.install	set filetype=php
+au BufNewFile,BufRead *.module	set filetype=php
 
 " Smarty
-au BufNewFile,BufRead *.tpl set filetype=smarty
+au BufNewFile,BufRead *.tpl		set filetype=smarty
 
 " Mobile Balance plugin
-au BufNewFile,BufRead *.jsmb set filetype=javascript
+au BufNewFile,BufRead *.jsmb	set filetype=javascript
 
 " Nginx
 au BufNewFile,BufRead /etc/nginx/*,/usr/local/nginx/conf/* set filetype=nginx
 
 
-" vim:fenc=cp1251
+" vim:fenc=utf-8
